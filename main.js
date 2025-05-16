@@ -110,13 +110,61 @@ const durationDefs = {
 let audioCtx = null;
 let masterGain = null;
 let activeOscs = [];
+let highlightTimers = [];
+
+const macros = {
+  kick_drum: "{ NOTE_A2, 10 }",
+  snare_drum: "{ NOTE_B6, 10 }",
+};
+
+function expandMacrosWithOffsets(text) {
+  const macros = {
+    kick_drum: "{ NOTE_A2, 10 }",
+    snare_drum: "{ NOTE_B6, 10 }",
+  };
+
+  let offsetMap = [];
+  let result = "";
+  let lastIndex = 0;
+  let match;
+  const re = /\b([a-zA-Z_][a-zA-Z0-9_]*)\b/g;
+
+  while ((match = re.exec(text))) {
+    const macroName = match[1];
+    const macroValue = macros[macroName];
+    const before = text.slice(lastIndex, match.index);
+    result += before;
+
+    const insertStart = result.length;
+
+    if (macroValue) {
+      result += macroValue;
+
+      offsetMap.push({
+        originalStart: match.index,
+        originalEnd: re.lastIndex,
+        newStart: insertStart,
+        newEnd: insertStart + macroValue.length,
+        isMacro: true,
+      });
+    } else {
+      result += macroName;
+    }
+
+    lastIndex = re.lastIndex;
+  }
+
+  result += text.slice(lastIndex);
+  return { expanded: result, offsetMap };
+}
 
 function parseSequence(text) {
+  const { expanded, offsetMap } = expandMacrosWithOffsets(text);
   const seq = [];
   const re =
     /\{\s*NOTE_([A-G][sf]?\d|REST)\s*,\s*([a-zA-Z_][a-zA-Z0-9_]*|\d+)\s*,?\s*\}/g;
   let m;
-  while ((m = re.exec(text))) {
+  while ((m = re.exec(expanded))) {
     const name = m[1];
     const durRaw = m[2];
 
@@ -125,7 +173,19 @@ function parseSequence(text) {
       : parseInt(durRaw, 10);
 
     const freq = noteFreq[name] !== undefined ? noteFreq[name] : null;
-    seq.push({ freq, dur, start: m.index, end: re.lastIndex });
+
+    let start = m.index;
+    let end = re.lastIndex;
+
+    for (const map of offsetMap) {
+      if (start >= map.newStart && start < map.newEnd) {
+        start = map.originalStart;
+        end = map.originalEnd;
+        break;
+      }
+    }
+
+    seq.push({ freq, dur, start, end });
   }
   return seq;
 }
@@ -137,6 +197,10 @@ function stopSequence() {
     } catch {}
   });
   activeOscs = [];
+
+  highlightTimers.forEach(clearTimeout);
+  highlightTimers = [];
+
   if (audioCtx) {
     audioCtx.close();
     audioCtx = masterGain = null;
@@ -166,10 +230,24 @@ function playSequence(seq, volume) {
     }
 
     const delay = t - audioCtx.currentTime;
-    setTimeout(() => {
-      textarea.setSelectionRange(start, end);
-      textarea.scrollTop = textarea.scrollHeight;
+
+    const timeoutId = setTimeout(() => {
+      const txt = textarea.value;
+      const lineStart = txt.lastIndexOf("\n", start - 1) + 1;
+
+      let lineEnd = txt.indexOf("\n", lineStart);
+      if (lineEnd === -1) lineEnd = txt.length;
+
+      textarea.setSelectionRange(lineStart, lineEnd);
+
+      const lineNumber = txt.slice(0, lineStart).split("\n").length;
+      const lineHeight = 20;
+      const targetScroll =
+        (lineNumber - 1) * lineHeight - textarea.clientHeight / 2;
+      textarea.scrollTop = Math.max(0, targetScroll);
     }, delay * 1000);
+
+    highlightTimers.push(timeoutId);
 
     t += dur / 1000;
   });

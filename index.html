@@ -13,7 +13,7 @@
       textarea {
         display: block;
         margin: 10px auto;
-        width: 300px;
+        width: 100%;
         height: 600px;
         background: #222;
         color: #eee;
@@ -38,21 +38,55 @@
         border-radius: 4px;
         cursor: pointer;
       }
+      #note-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      pre {
+        text-align: left;
+        background: #1e1e1e;
+        padding: 1em;
+        overflow-x: auto;
+        border-radius: 5px;
+        margin: 10px auto;
+        width: 90%;
+        max-width: 800px;
+      }
     </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
   </head>
   <body>
     <div class="controls">
       <label
         >Vol:
-        <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5"
+        <input type="range" id="volume" min="0" max="1" step="0.01" value="0.1"
       /></label>
       <button id="playBtn">Play</button>
       <button id="stopBtn">Stop</button>
     </div>
-    <textarea
-      id="noteList"
-      placeholder="add notes like { NOTE_C3, 125 }, { NOTE_REST, 250 }..."
-    >
+    <div id="note-container">
+      <pre><code class="language-c">
+#define whole_note (2000) 
+#define half_note (whole_note / 2)
+#define quarter_note (whole_note / 4)
+#define dotted_quarter ((3 * whole_note) / 8)
+#define eighth_note (whole_note / 8)
+#define sixteenth_note (whole_note / 16)
+#define thirtysecond_note (whole_note / 32)
+#define kick_drum { NOTE_A2, 10, }
+#define snare_drum { NOTE_B6, 10, }
+</code></pre>
+
+      <textarea
+        id="noteList"
+        spellcheck="false"
+        placeholder="add notes like { NOTE_C3, 125 }, { NOTE_REST, 250 }..."
+      >
 
 
 { NOTE_C4, sixteenth_note, },
@@ -91,7 +125,11 @@
 
 
   </textarea
-    >
+      >
+    </div>
     <script type="module" src="main.js"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
   </body>
 </html>
