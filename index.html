@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Text-Input Sequence Player</title>
+    <style>
+      body {
+        background: #111;
+        color: #eee;
+        font-family: sans-serif;
+        text-align: center;
+      }
+      textarea {
+        display: block;
+        margin: 10px auto;
+        width: 300px;
+        height: 600px;
+        background: #222;
+        color: #eee;
+        border: 1px solid #555;
+        padding: 8px;
+        font-family: monospace;
+      }
+      .controls {
+        margin: 10px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .controls input[type="range"],
+      .controls button {
+        padding: 6px 12px;
+        font-size: 14px;
+        background: #333;
+        color: #eee;
+        border: 1px solid #555;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="controls">
+      <label
+        >Vol:
+        <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5"
+      /></label>
+      <button id="playBtn">Play</button>
+      <button id="stopBtn">Stop</button>
+    </div>
+    <textarea
+      id="noteList"
+      placeholder="add notes like { NOTE_C3, 125 }, { NOTE_REST, 250 }..."
+    >
+
+
+{ NOTE_C4, sixteenth_note, },
+{ NOTE_G3, sixteenth_note, },
+{ NOTE_Ef4, sixteenth_note, },
+{ NOTE_G4, eighth_note, },
+
+{ NOTE_C4, sixteenth_note, },
+{ NOTE_REST, sixteenth_note, },
+{ NOTE_Ef4, sixteenth_note, },
+{ NOTE_F4, sixteenth_note, },
+
+{ NOTE_G4, sixteenth_note, },
+{ NOTE_REST, sixteenth_note, },
+{ NOTE_C5, eighth_note, },
+
+{ NOTE_G4, sixteenth_note, },
+{ NOTE_F4, sixteenth_note, },
+{ NOTE_Ef4, sixteenth_note, },
+{ NOTE_REST, sixteenth_note, },
+
+{ NOTE_C4, sixteenth_note, },
+{ NOTE_G3, sixteenth_note, },
+{ NOTE_Ef4, sixteenth_note, },
+{ NOTE_G4, eighth_note, },
+
+{ NOTE_C5, sixteenth_note, },
+{ NOTE_REST, sixteenth_note, },
+{ NOTE_Ef5, sixteenth_note, },
+{ NOTE_C5, sixteenth_note, },
+
+{ NOTE_G4, sixteenth_note, },
+{ NOTE_Ef4, sixteenth_note, },
+{ NOTE_C4, sixteenth_note, },
+{ NOTE_REST, quater_note, },
+
+
+  </textarea
+    >
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
